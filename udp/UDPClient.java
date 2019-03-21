@@ -1,12 +1,13 @@
 package udp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 public class UDPClient {
 
@@ -23,12 +24,12 @@ public class UDPClient {
 
   private void send() {
     Thread thread = new Thread(() -> {
-      Scanner sc = new Scanner(System.in);
+      BufferedReader bis = new BufferedReader(new InputStreamReader(System.in));
       try {
         DatagramSocket socket = new DatagramSocket();
         InetAddress inetAddress = InetAddress.getByName("192.168.42.255");
         String sendMessage;
-        while (!(sendMessage = sc.nextLine()).equals("exit")) {
+        while (!(sendMessage = bis.readLine()).equals("exit")) {
           DatagramPacket send = new DatagramPacket(sendMessage.getBytes(StandardCharsets.UTF_8),
               sendMessage.length(), inetAddress, 8888);
           socket.send(send);
@@ -46,9 +47,10 @@ public class UDPClient {
     Thread thread = new Thread(() -> {
       try {
         DatagramSocket socket = new DatagramSocket(8888);
-        byte[] buffer = new byte[1024];
-        DatagramPacket receive = new DatagramPacket(buffer, buffer.length);
+        byte[] buffer;
         while (true) {
+          buffer = new byte[1024];
+          DatagramPacket receive = new DatagramPacket(buffer, buffer.length);
           socket.receive(receive);
           byte[] get = receive.getData();
           String getString = new String(get, 0, get.length).trim();
@@ -63,3 +65,4 @@ public class UDPClient {
     thread.start();
   }
 }
+
